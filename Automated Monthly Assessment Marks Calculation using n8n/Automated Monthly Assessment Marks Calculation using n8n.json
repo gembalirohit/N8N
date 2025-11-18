@@ -1,0 +1,380 @@
+{
+  "name": "Eligibility Check",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Placement Eligibility Check",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Select Course",
+              "placeholder": "DA/DS",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Mail ID",
+              "fieldType": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "S1",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "S2",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "S3",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "S4",
+              "fieldType": "number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "S5",
+              "fieldType": "number",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -800,
+        1088
+      ],
+      "id": "f37d647f-cf9c-41d9-8034-cd6ccdcd6b7e",
+      "name": "On form submission",
+      "webhookId": "aefa28b0-6d50-4728-b6b0-6d99e81df901"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39b1a61f-b684-46be-b722-c07631c5d408",
+              "leftValue": "={{ $json['Select Course'] }}",
+              "rightValue": "DA",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -576,
+        1088
+      ],
+      "id": "f3e869a8-40ce-40d4-a834-5c36bfe73298",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "result = (_input.first().json.S1 + _input.first().json.S2 + _input.first().json.S3 + _input.first().json.S4 + _input.first().json.S5) / 5\nreturn [{\"average\": result}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        896
+      ],
+      "id": "e605a4f3-7715-4045-b9a3-4aa6509ff3c1",
+      "name": "Code in Python (Beta)"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "result = (_input.first().json.S1 + _input.first().json.S2 + _input.first().json.S3 + _input.first().json.S4 + _input.first().json.S5) / 5\nreturn [{\"average\": result}]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -352,
+        1280
+      ],
+      "id": "5a5c4d42-bce2-403b-b6ca-10d507e79730",
+      "name": "Code in Python (Beta)1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8bfb8723-2ee9-4cc0-a22d-71fd2c5b1294",
+              "leftValue": "={{ $json.average }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        896
+      ],
+      "id": "2f92c8cb-b908-4af2-b2dc-7b698b74dc7e",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8bfb8723-2ee9-4cc0-a22d-71fd2c5b1294",
+              "leftValue": "={{ $json.average }}",
+              "rightValue": 80,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        1280
+      ],
+      "id": "089cc963-9d60-40e3-a710-9aec935263c1",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').first().json['Mail ID'] }}",
+        "subject": "Placement Eligibility Result - Data Analytics Course",
+        "message": "=<h2>Placement Eligibility Result</h2><p>Dear Student,</p><p>Your average score is: <strong>{{ $('Code in Python (Beta)').first().json.average }}</strong></p><p><strong>Status: Eligible for Placement</strong></p><p>Congratulations! You meet the eligibility criteria (average > 80) for placement opportunities.</p><p>Best regards,<br>Placement Team</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        800
+      ],
+      "id": "4d32c3d9-b285-4810-a68a-bf8fce2183af",
+      "name": "Send a message",
+      "webhookId": "dbe5fe97-50e0-4008-b243-d5c9f4e0e88e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qW9ehmU0RZpdEoHQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').first().json['Mail ID'] }}",
+        "subject": "Placement Eligibility Result - Data Analytics Course",
+        "message": "=<h2>Placement Eligibility Result</h2><p>Dear Student,</p><p>Your average score is: <strong>{{ $('Code in Python (Beta)').first().json.average }}</strong></p><p><strong>Status: Not Eligible for Placement</strong></p><p>Unfortunately, you do not meet the eligibility criteria (average > 80) for placement opportunities at this time.</p><p>Best regards,<br>Placement Team</p>",
+        "options": {}
+      },
+      "id": "61bb8a85-9ac9-4c27-8ba7-89080085b468",
+      "name": "Send rejection message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        992
+      ],
+      "webhookId": "69a80d90-ddd5-4611-a2a6-da1ba08356ca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qW9ehmU0RZpdEoHQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').first().json['Mail ID'] }}",
+        "subject": "Placement Eligibility Result - Data Science Course",
+        "message": "=<h2>Placement Eligibility Result</h2><p>Dear Student,</p><p>Your average score is: <strong>{{ $('Code in Python (Beta)1').first().json.average }}</strong></p><p><strong>Status: Eligible for Placement</strong></p><p>Congratulations! You meet the eligibility criteria (average > 80) for placement opportunities.</p><p>Best regards,<br>Placement Team</p>",
+        "options": {}
+      },
+      "id": "07356e8a-a93c-4577-ad52-b24820d7929d",
+      "name": "Send DS eligible message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        1184
+      ],
+      "webhookId": "d93bdd37-301a-4b51-a97a-44e04f9d91ca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qW9ehmU0RZpdEoHQ",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').first().json['Mail ID'] }}",
+        "subject": "Placement Eligibility Result - Data Science Course",
+        "message": "=<h2>Placement Eligibility Result</h2><p>Dear Student,</p><p>Your average score is: <strong>{{ $('Code in Python (Beta)1').first().json.average }}</strong></p><p><strong>Status: Not Eligible for Placement</strong></p><p>Unfortunately, you do not meet the eligibility criteria (average > 80) for placement opportunities at this time.</p><p>Best regards,<br>Placement Team</p>",
+        "options": {}
+      },
+      "id": "be62a99f-493b-49da-b01a-233886f0acb5",
+      "name": "Send DS rejection message",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        96,
+        1376
+      ],
+      "webhookId": "8845c3c3-9508-4390-a8ee-9c6fc584b38b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "qW9ehmU0RZpdEoHQ",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in Python (Beta)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python (Beta)1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send rejection message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send DS eligible message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send DS rejection message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2c1f408e-acdf-4fa3-985f-4fcec673415c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2340ceafe366048bb28acb8a7bb2947635c63ecfd1b1ce3a9ee95d44ac6531cf"
+  },
+  "id": "Cw9K5nP6W3BoDSbh",
+  "tags": []
+}
